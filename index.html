@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdventureRent - Sewa Alat Pendakian Gunung Tepercaya</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forest: {
+                            50: '#f2f9f5',
+                            100: '#e1f2e8',
+                            600: '#15803d',
+                            700: '#166534',
+                            800: '#16502d',
+                            900: '#134227',
+                            950: '#0a2517'
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        earth: '#2d3748'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .toast-enter {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        .toast-enter-active {
+            transform: translateY(0);
+            opacity: 1;
+            transition: all 300ms ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-forest-600 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
+                <div class="w-11 h-11 bg-forest-700 text-white rounded-xl flex items-center justify-center text-xl font-black shadow-md shadow-forest-700/20">
+                    <i class="fa-solid fa-mountain text-amber-500"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-black text-slate-900 tracking-tight leading-none block">Adventure<span class="text-forest-600">Rent</span></span>
+                    <span class="text-[10px] text-slate-500 font-semibold tracking-wider uppercase block">Sewa Alat Gunung Pro</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                <button onclick="navigateTo('home')" id="nav-home" class="nav-btn transition hover:text-forest-600">Beranda</button>
+                <button onclick="navigateTo('catalog')" id="nav-catalog" class="nav-btn transition hover:text-forest-600">Katalog Alat</button>
+                <button onclick="navigateTo('guide')" id="nav-guide" class="nav-btn transition hover:text-forest-600">Cara Sewa</button>
+                <button onclick="navigateTo('contact')" id="nav-contact" class="nav-btn transition hover:text-forest-600">Kontak & Lokasi</button>
+            </nav>
+
+            <!-- Header Action Buttons -->
+            <div class="flex items-center gap-3">
+                <button onclick="navigateTo('cart')" class="relative p-2.5 text-slate-700 hover:text-forest-600 hover:bg-slate-100 rounded-xl transition">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-amber-500 text-slate-900 font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center border-2 border-white hidden">0</span>
+                </button>
+                <button onclick="navigateTo('catalog')" class="hidden sm:inline-flex bg-forest-700 hover:bg-forest-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-md shadow-forest-700/20 items-center gap-2">
+                    <i class="fa-solid fa-compass"></i>
+                    Sewa Sekarang
+                </button>
+                
+                <!-- Mobile menu button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-3">
+            <button onclick="navigateTo('home'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 text-slate-700 font-medium rounded-lg hover:bg-slate-50">Beranda</button>
+            <button onclick="navigateTo('catalog'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 text-slate-700 font-medium rounded-lg hover:bg-slate-50">Katalog Alat</button>
+            <button onclick="navigateTo('guide'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 text-slate-700 font-medium rounded-lg hover:bg-slate-50">Cara Sewa</button>
+            <button onclick="navigateTo('contact'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 text-slate-700 font-medium rounded-lg hover:bg-slate-50">Kontak</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow">
+
+        <!-- VIEW: HOME -->
+        <section id="view-home" class="page-view space-y-16 py-6">
+            <!-- Hero Section -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="relative rounded-3xl overflow-hidden bg-slate-900 text-white p-8 sm:p-12 lg:p-16 min-h-[500px] flex items-center shadow-2xl">
+                    <!-- Background overlay image -->
+                    <div class="absolute inset-0 z-0 opacity-40 mix-blend-overlay bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1600');"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/80 to-transparent z-0"></div>
+
+                    <div class="relative z-10 max-w-2xl space-y-6">
+                        <span class="inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase">
+                            <i class="fa-solid fa-shield-halved"></i> 100% Alat Steril & Layak Pakai
+                        </span>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
+                            Jelajahi Puncak Tanpa Beban Beli Alat
+                        </h1>
+                        <p class="text-slate-300 text-base sm:text-lg font-normal leading-relaxed">
+                            Penyewaan alat pendakian outdoor lengkap & tepercaya. Tenda, carrier, kompor, hingga perlengkapan dingin profesional dengan syarat jaminan mudah & fleksibel.
+                        </p>
+                        <div class="flex flex-wrap gap-4 pt-2">
+                            <button onclick="navigateTo('catalog')" class="bg-forest-600 hover:bg-forest-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-forest-600/30 transition flex items-center gap-3">
+                                Lihat Katalog Alat <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <a href="#calculator" class="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white px-6 py-4 rounded-xl font-semibold border border-white/20 transition flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-amber-400"></i> Hitung Kebutuhan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Gear Calculator Widget -->
+            <div id="calculator" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-forest-600">Fitur Pintar</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Kalkulator Rekomendasi Perlengkapan</h2>
+                            <p class="text-slate-500 text-sm">Tentukan jumlah personil & durasi, kami rekomendasikan paket alat wajibnya.</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-100 px-4 py-2 rounded-xl">
+                            <i class="fa-solid fa-circle-info text-forest-600"></i> Bebas sesuaikan alat nanti
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-6 rounded-2xl mb-6">
+                        <!-- Personil Slider -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase text-slate-600 flex justify-between">
+                                Jumlah Personil: <span id="calc-person-val" class="text-forest-700 text-base font-black">2 Orang</span>
+                            </label>
+                            <input type="range" id="calc-person" min="1" max="10" value="2" oninput="updateCalculator()" class="w-full accent-forest-600 cursor-pointer h-2 bg-slate-200 rounded-lg">
+                        </div>
+
+                        <!-- Durasi -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase text-slate-600">Durasi Pendakian</label>
+                            <select id="calc-duration" onchange="updateCalculator()" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="1">Tek-Tok / 1 Hari (Tanpa Menginap)</option>
+                                <option value="2" selected>2 Hari 1 Malam (Standard)</option>
+                                <option value="3">3 Hari 2 Malam (Ekspedisi Sedang)</option>
+                                <option value="4">4+ Hari (Ekspedisi Panjang)</option>
+                            </select>
+                        </div>
+
+                        <!-- Musim / Cuaca -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase text-slate-600">Estimasi Cuaca Jalur</label>
+                            <select id="calc-weather" onchange="updateCalculator()" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="normal">Cerah / Normal</option>
+                                <option value="rainy">Musim Hujan / Ekstrem (+ Flysheet & Cover)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Output Recommendation -->
+                    <div class="border-t border-slate-200 pt-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Rekomendasi Paket Utama:</h3>
+                            <span id="calc-est-price" class="text-slate-900 font-extrabold text-lg">Estimasi: <span class="text-forest-700">Rp 120.000</span>/hari</span>
+                        </div>
+                        <div id="calc-results-list" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <!-- Items injected via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Fast Access -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900">Kategori Peralatan Utama</h2>
+                    <p class="text-slate-500 mt-2">Pilih alat berkualitas tinggi yang dirawat secara berkala</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div onclick="filterCategoryAndNavigate('Tenda')" class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-slate-100 text-center cursor-pointer group transition">
+                        <div class="w-14 h-14 mx-auto bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-campground"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800">Tenda & Shelter</h3>
+                        <p class="text-xs text-slate-400 mt-1">Kapasitas 2-8 Orang</p>
+                    </div>
+
+                    <div onclick="filterCategoryAndNavigate('Carrier')" class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-slate-100 text-center cursor-pointer group transition">
+                        <div class="w-14 h-14 mx-auto bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800">Tas Carrier</h3>
+                        <p class="text-xs text-slate-400 mt-1">35L - 80L Ergo-fit</p>
+                    </div>
+
+                    <div onclick="filterCategoryAndNavigate('Cooking')" class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-slate-100 text-center cursor-pointer group transition">
+                        <div class="w-14 h-14 mx-auto bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-fire-burner"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800">Alat Masak</h3>
+                        <p class="text-xs text-slate-400 mt-1">Kompor, Nesting, Gas</p>
+                    </div>
+
+                    <div onclick="filterCategoryAndNavigate('Sleeping')" class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-slate-100 text-center cursor-pointer group transition">
+                        <div class="w-14 h-14 mx-auto bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-bed"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800">Perlengkapan Tidur</h3>
+                        <p class="text-xs text-slate-400 mt-1">Sleeping Bag & Matras</p>
+                    </div>
+
+                    <div onclick="filterCategoryAndNavigate('Accessories')" class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-slate-100 text-center cursor-pointer group transition col-span-2 md:col-span-1">
+                        <div class="w-14 h-14 mx-auto bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-headlamp"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800">Lampu & Aksesori</h3>
+                        <p class="text-xs text-slate-400 mt-1">Headlamp, Trekking Pole</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Showcase -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Populer Disewa Minggu Ini</h2>
+                        <p class="text-slate-500 text-sm">Peralatan favorit pendakian gunung lokal</p>
+                    </div>
+                    <button onclick="navigateTo('catalog')" class="text-forest-700 font-bold hover:underline text-sm flex items-center gap-1">
+                        Lihat Semua <i class="fa-solid fa-angle-right"></i>
+                    </button>
+                </div>
+
+                <div id="home-featured-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Dynamic Featured Items -->
+                </div>
+            </div>
+
+            <!-- Why Choose Us -->
+            <div class="bg-forest-900 text-white py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <div class="p-6 space-y-3">
+                            <div class="w-16 h-16 bg-forest-800 text-amber-400 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-forest-700">
+                                <i class="fa-solid fa-pump-soap"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">100% Steril & Bersih</h3>
+                            <p class="text-forest-100 text-sm leading-relaxed">Tenda dan sleeping bag dicuci serta didisinfeksi secara rutin setelah setiap pemakaian.</p>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="w-16 h-16 bg-forest-800 text-amber-400 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-forest-700">
+                                <i class="fa-solid fa-handshake"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Jaminan KTP Fleksibel</h3>
+                            <p class="text-forest-100 text-sm leading-relaxed">Proses pendaftaran mudah tanpa deposit berlebih, cukup jaminan identitas valid (KTP/SIM/KTM).</p>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="w-16 h-16 bg-forest-800 text-amber-400 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-forest-700">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Konsultasi Gratis</h3>
+                            <p class="text-forest-100 text-sm leading-relaxed">Tim kami adalah pendaki berpengalaman yang siap memberikan info jalur & tips keselamatan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CATALOG -->
+        <section id="view-catalog" class="page-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-slate-900">Katalog Peralatan Pendakian</h1>
+                    <p class="text-slate-500 text-sm mt-1">Pilih peralatan sesuai kebutuhan ekspedisi Anda</p>
+                </div>
+                
+                <!-- Search & Sort Controls -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="relative flex-1 sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="catalog-search" oninput="applyFilters()" placeholder="Cari tenda, kompor..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <select id="catalog-sort" onchange="applyFilters()" class="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        <option value="popular">Paling Populer</option>
+                        <option value="low-high">Harga: Rendah - Tinggi</option>
+                        <option value="high-low">Harga: Tinggi - Rendah</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar text-sm font-semibold">
+                <button onclick="setCategoryFilter('all')" class="cat-pill bg-forest-700 text-white px-5 py-2 rounded-full whitespace-nowrap transition shadow-sm" data-cat="all">Semua Peralatan</button>
+                <button onclick="setCategoryFilter('Tenda')" class="cat-pill bg-white hover:bg-slate-100 text-slate-600 px-5 py-2 rounded-full border border-slate-200 whitespace-nowrap transition" data-cat="Tenda">Tenda & Shelter</button>
+                <button onclick="setCategoryFilter('Carrier')" class="cat-pill bg-white hover:bg-slate-100 text-slate-600 px-5 py-2 rounded-full border border-slate-200 whitespace-nowrap transition" data-cat="Carrier">Tas Carrier</button>
+                <button onclick="setCategoryFilter('Cooking')" class="cat-pill bg-white hover:bg-slate-100 text-slate-600 px-5 py-2 rounded-full border border-slate-200 whitespace-nowrap transition" data-cat="Cooking">Alat Masak</button>
+                <button onclick="setCategoryFilter('Sleeping')" class="cat-pill bg-white hover:bg-slate-100 text-slate-600 px-5 py-2 rounded-full border border-slate-200 whitespace-nowrap transition" data-cat="Sleeping">Sleeping Gear</button>
+                <button onclick="setCategoryFilter('Accessories')" class="cat-pill bg-white hover:bg-slate-100 text-slate-600 px-5 py-2 rounded-full border border-slate-200 whitespace-nowrap transition" data-cat="Accessories">Aksesori & Lampu</button>
+            </div>
+
+            <!-- Catalog Grid -->
+            <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Injected via JavaScript -->
+            </div>
+
+            <!-- Empty State Placeholder -->
+            <div id="catalog-empty" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200">
+                <i class="fa-solid fa-box-open text-5xl text-slate-300 mb-4"></i>
+                <h3 class="text-lg font-bold text-slate-700">Peralatan tidak ditemukan</h3>
+                <p class="text-slate-400 text-sm mt-1">Coba gunakan kata kunci lain atau pilih kategori berbeda.</p>
+            </div>
+        </section>
+
+        <!-- VIEW: PRODUCT DETAIL -->
+        <section id="view-detail" class="page-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <button onclick="navigateTo('catalog')" class="text-slate-600 hover:text-forest-600 font-semibold text-sm mb-6 inline-flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Kembali ke Katalog
+            </button>
+
+            <div id="detail-container" class="bg-white rounded-3xl p-6 sm:p-10 shadow-lg border border-slate-100">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- VIEW: CART & RENTAL DATES -->
+        <section id="view-cart" class="page-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <h1 class="text-3xl font-extrabold text-slate-900">Keranjang Sewa Peralatan</h1>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column: Item List & Date Picker -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Date Selector Box -->
+                    <div class="bg-forest-50/70 border border-forest-100 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center gap-3 text-forest-800 font-bold text-lg border-b border-forest-200/60 pb-3">
+                            <i class="fa-regular fa-calendar-days text-forest-600 text-xl"></i>
+                            Pilih Durasi & Tanggal Sewa
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Tanggal Ambil Alat</label>
+                                <input type="date" id="rental-start-date" onchange="calculateRentalDuration()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-forest-600">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Tanggal Pengembalian</label>
+                                <input type="date" id="rental-end-date" onchange="calculateRentalDuration()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-forest-600">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-xs font-semibold text-slate-600 pt-2">
+                            <span>Estimasi Durasi Penyewaan:</span>
+                            <span id="rental-duration-display" class="bg-forest-700 text-white px-3 py-1 rounded-full font-bold">1 Hari (24 Jam)</span>
+                        </div>
+                    </div>
+
+                    <!-- Cart Item Table/List -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                        <div class="p-4 bg-slate-50 border-b border-slate-200 font-bold text-xs uppercase text-slate-500 tracking-wider flex justify-between">
+                            <span>Barang Disewa</span>
+                            <span>Subtotal</span>
+                        </div>
+                        <div id="cart-items-list" class="divide-y divide-slate-100">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Cost Summary -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+                        <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">Ringkasan Biaya</h2>
+                        
+                        <div class="space-y-2 text-sm text-slate-600">
+                            <div class="flex justify-between">
+                                <span>Total Tarif Alat / Hari:</span>
+                                <span id="cart-subtotal-per-day" class="font-semibold text-slate-800">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Durasi Sewa:</span>
+                                <span id="cart-days-count" class="font-semibold text-slate-800">1 Hari</span>
+                            </div>
+                            <div class="flex justify-between border-t border-slate-100 pt-2 font-medium">
+                                <span>Total Sewa Peralatan:</span>
+                                <span id="cart-total-rental-fee" class="font-bold text-slate-900">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                                <span>Deposit Jaminan (Refundable):</span>
+                                <span id="cart-deposit-fee" class="font-bold">Rp 50.000</span>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-200 pt-3 flex justify-between items-end">
+                            <div>
+                                <span class="text-xs uppercase font-bold text-slate-400 block">Total Estimasi Pembayaran</span>
+                                <span id="cart-grand-total" class="text-2xl font-black text-forest-700">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <button onclick="navigateTo('checkout')" id="btn-proceed-checkout" class="w-full bg-forest-700 hover:bg-forest-800 text-white font-bold py-3.5 rounded-xl transition shadow-md shadow-forest-700/20 text-center block">
+                            Lanjut ke Pembayaran & Jaminan <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Syarat singkat -->
+                    <div class="bg-slate-100 rounded-xl p-4 text-xs text-slate-500 space-y-2">
+                        <p class="font-bold text-slate-700"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Ketentuan Denda Keterlambatan:</p>
+                        <p>Keterlambatan pengembalian tanpa konfirmasi dikenakan denda 100% dari tarif sewa harian per 24 jam.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CHECKOUT & PAYMENT -->
+        <section id="view-checkout" class="page-view hidden max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <button onclick="navigateTo('cart')" class="text-slate-600 hover:text-forest-600 font-semibold text-sm inline-flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Kembali ke Keranjang
+            </button>
+
+            <h1 class="text-3xl font-extrabold text-slate-900">Formulir Penyewaan & Pembayaran</h1>
+
+            <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)" class="space-y-8">
+                <!-- Step 1: Identitas Penyewa -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                    <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-forest-700 text-white rounded-full text-xs flex items-center justify-center font-bold">1</span>
+                        Data Identitas Penyewa
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nama Lengkap (Sesuai KTP) *</label>
+                            <input type="text" required placeholder="Budi Santoso" class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-forest-600">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nomor WhatsApp Aktif *</label>
+                            <input type="tel" required placeholder="081234567890" class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-forest-600">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Alamat Tempat Tinggal Sekarang *</label>
+                            <textarea required rows="2" placeholder="Jl. Mawar No. 12, Kel. Menteng..." class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-forest-600"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Upload Jaminan KTP -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                    <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-forest-700 text-white rounded-full text-xs flex items-center justify-center font-bold">2</span>
+                        Dokumen Jaminan (KTP / SIM / KTM)
+                    </h2>
+                    
+                    <p class="text-xs text-slate-500">Identitas asli wajib diserahkan fisik saat pengambilan alat di toko, atau unggah foto untuk verifikasi awal.</p>
+
+                    <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition cursor-pointer relative">
+                        <input type="file" accept="image/*" onchange="previewKtpUpload(event)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                        <div id="ktp-upload-prompt" class="space-y-2">
+                            <i class="fa-solid fa-id-card text-4xl text-slate-300"></i>
+                            <p class="text-sm font-semibold text-slate-700">Klik atau seret foto KTP di sini</p>
+                            <p class="text-xs text-slate-400">Format PNG, JPG (Maks 5MB)</p>
+                        </div>
+                        <div id="ktp-upload-preview" class="hidden">
+                            <img id="ktp-preview-img" src="" alt="KTP Preview" class="max-h-40 mx-auto rounded-lg shadow-sm">
+                            <p class="text-xs text-emerald-600 font-bold mt-2"><i class="fa-solid fa-circle-check"></i> Foto Identitas Siap Diunggah</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Pembayaran -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                    <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-forest-700 text-white rounded-full text-xs flex items-center justify-center font-bold">3</span>
+                        Opsi Skema & Metode Pembayaran
+                    </h2>
+
+                    <!-- Down Payment / Full Payment -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase text-slate-600">Skema Bayar</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="border border-slate-200 p-3.5 rounded-xl flex items-center gap-3 cursor-pointer hover:bg-slate-50">
+                                <input type="radio" name="payment_scheme" value="dp" checked onchange="updatePaymentAmounts()" class="accent-forest-600">
+                                <div>
+                                    <span class="block text-sm font-bold text-slate-800">Uang Muka (DP 50%)</span>
+                                    <span class="text-xs text-slate-500">Pelunasan saat ambil alat</span>
+                                </div>
+                            </label>
+                            <label class="border border-slate-200 p-3.5 rounded-xl flex items-center gap-3 cursor-pointer hover:bg-slate-50">
+                                <input type="radio" name="payment_scheme" value="full" onchange="updatePaymentAmounts()" class="accent-forest-600">
+                                <div>
+                                    <span class="block text-sm font-bold text-slate-800">Lunas (100%)</span>
+                                    <span class="text-xs text-slate-500">Proses cepat saat ambil</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Payment Options -->
+                    <div class="space-y-2 pt-2">
+                        <label class="block text-xs font-bold uppercase text-slate-600">Pilih Metode Pembayaran</label>
+                        <div class="space-y-2">
+                            <label class="border border-slate-200 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-50">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" name="payment_method" value="qris" checked class="accent-forest-600">
+                                    <span class="text-sm font-bold text-slate-800">QRIS (Gopay/OVO/Dana/ShopeePay)</span>
+                                </div>
+                                <i class="fa-solid fa-qrcode text-xl text-slate-600"></i>
+                            </label>
+                            <label class="border border-slate-200 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-50">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" name="payment_method" value="bca" class="accent-forest-600">
+                                    <span class="text-sm font-bold text-slate-800">Transfer Bank BCA</span>
+                                </div>
+                                <span class="text-xs font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded">BCA</span>
+                            </label>
+                            <label class="border border-slate-200 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-50">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" name="payment_method" value="mandiri" class="accent-forest-600">
+                                    <span class="text-sm font-bold text-slate-800">Transfer Bank Mandiri</span>
+                                </div>
+                                <span class="text-xs font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded">MANDIRI</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Payment Total Calculation Card -->
+                    <div class="bg-forest-900 text-white p-5 rounded-xl space-y-2 mt-4">
+                        <div class="flex justify-between text-xs text-slate-300">
+                            <span>Tagihan Yang Harus Dibayar Sekarang:</span>
+                            <span id="checkout-pay-now-label" class="font-bold text-amber-400">DP 50%</span>
+                        </div>
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-2xl font-black text-amber-400" id="checkout-pay-now-amount">Rp 0</span>
+                            <span class="text-xs text-slate-300">Sisa Tagihan: <span id="checkout-pay-later-amount" class="font-bold">Rp 0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-forest-700 hover:bg-forest-800 text-white font-bold py-4 rounded-xl text-lg transition shadow-lg shadow-forest-700/30">
+                    Konfirmasi Booking & Bayar Sekarang <i class="fa-solid fa-check-circle ml-1"></i>
+                </button>
+            </form>
+        </section>
+
+        <!-- VIEW: ORDER CONFIRMATION / INVOICE -->
+        <section id="view-receipt" class="page-view hidden max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xl space-y-8">
+                <!-- Header Status -->
+                <div class="text-center space-y-2 border-b border-slate-100 pb-6">
+                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-3">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <span class="bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Menunggu Pembayaran</span>
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900">Bukti Pemesanan Sewa</h1>
+                    <p class="text-slate-500 text-xs">Kode Booking: <span id="receipt-booking-id" class="font-mono font-bold text-slate-800">ADV-2026-XXXX</span></p>
+                </div>
+
+                <!-- QRIS / Payment Instruction Placeholder -->
+                <div class="bg-slate-50 p-6 rounded-2xl text-center space-y-4 border border-slate-200">
+                    <p class="text-xs font-bold text-slate-600 uppercase">Silakan Scan / Transfer Ke Rekening Resmi</p>
+                    <div class="w-48 h-48 mx-auto bg-white p-3 rounded-xl shadow-inner border border-slate-200 flex items-center justify-center">
+                        <!-- QR Code visual mock -->
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=ADVRENT-PAYMENT-SIMULATION" alt="QRIS Code" class="w-full h-full object-contain">
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500">Nominal yang harus ditransfer:</p>
+                        <p id="receipt-transfer-amount" class="text-3xl font-black text-forest-700">Rp 0</p>
+                    </div>
+                </div>
+
+                <!-- Rental Order Details Summary -->
+                <div class="space-y-3 text-sm border-b border-slate-100 pb-6">
+                    <h3 class="font-bold text-slate-800 text-base">Rincian Reservasi:</h3>
+                    <div class="flex justify-between text-slate-600">
+                        <span>Tanggal Ambil & Kembali:</span>
+                        <span id="receipt-dates" class="font-semibold text-slate-800">-</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>Status Jaminan KTP:</span>
+                        <span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Terverifikasi</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button onclick="window.print()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i> Cetak Invoice
+                    </button>
+                    <button onclick="confirmPaymentSimulation()" class="flex-1 bg-forest-700 hover:bg-forest-800 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Konfirmasi via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CARA SEWA -->
+        <section id="view-guide" class="page-view hidden max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <h1 class="text-3xl font-extrabold text-slate-900">Panduan & Syarat Penyewaan</h1>
+                <p class="text-slate-500 text-sm">Proses sewa fleksibel dengan jaminan tepercaya</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center space-y-3">
+                    <div class="w-12 h-12 bg-forest-100 text-forest-700 font-black rounded-full flex items-center justify-center mx-auto text-xl">1</div>
+                    <h3 class="font-bold text-slate-800">Pilih Peralatan</h3>
+                    <p class="text-xs text-slate-500">Pilih alat secara eceran atau kalkulator sesuai kebutuhan durasi gunung.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center space-y-3">
+                    <div class="w-12 h-12 bg-forest-100 text-forest-700 font-black rounded-full flex items-center justify-center mx-auto text-xl">2</div>
+                    <h3 class="font-bold text-slate-800">Isi Form & Jaminan</h3>
+                    <p class="text-xs text-slate-500">Upload foto KTP/SIM asli untuk jaminan kelayakan penyewa.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center space-y-3">
+                    <div class="w-12 h-12 bg-forest-100 text-forest-700 font-black rounded-full flex items-center justify-center mx-auto text-xl">3</div>
+                    <h3 class="font-bold text-slate-800">Bayar DP / Lunas</h3>
+                    <p class="text-xs text-slate-500">Lakukan pembayaran via QRIS atau Transfer Bank untuk mengunci stok.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center space-y-3">
+                    <div class="w-12 h-12 bg-forest-100 text-forest-700 font-black rounded-full flex items-center justify-center mx-auto text-xl">4</div>
+                    <h3 class="font-bold text-slate-800">Ambil & Petualang</h3>
+                    <p class="text-xs text-slate-500">Ambil peralatan di toko/kirim instan, periksa kondisi alat bersama staf.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: KONTAK -->
+        <section id="view-contact" class="page-view hidden max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+            <div class="bg-white rounded-3xl border border-slate-200 p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <h1 class="text-3xl font-extrabold text-slate-900">Hubungi Basecamp Kami</h1>
+                    <p class="text-slate-500 text-sm">Ada pertanyaan seputar ketersediaan alat atau konsultasi jalur gunung?</p>
+                    
+                    <div class="space-y-4 text-sm">
+                        <div class="flex items-start gap-3 text-slate-700">
+                            <i class="fa-solid fa-location-dot text-forest-600 text-lg mt-1"></i>
+                            <div>
+                                <span class="font-bold block">Alamat Toko / Basecamp:</span>
+                                <span>Jl. Pendakian Raya No. 88, Kaki Gunung, Indonesia</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-slate-700">
+                            <i class="fa-brands fa-whatsapp text-forest-600 text-lg"></i>
+                            <div>
+                                <span class="font-bold block">WhatsApp Admin:</span>
+                                <span>+62 812-3456-7890</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-slate-700">
+                            <i class="fa-regular fa-clock text-forest-600 text-lg"></i>
+                            <div>
+                                <span class="font-bold block">Jam Operasional Toko:</span>
+                                <span>Senin - Minggu: 07:00 - 21:00 WIB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 rounded-2xl p-6 flex flex-col justify-center text-center space-y-4 border border-slate-200">
+                    <i class="fa-solid fa-map-location-dot text-5xl text-forest-700"></i>
+                    <h3 class="font-bold text-slate-800">Peta Lokasi Basecamp</h3>
+                    <p class="text-xs text-slate-500">Dekat dengan akses jalan utama menuju pintu pendakian gunung lokal.</p>
+                    <button onclick="alert('Membuka Google Maps ke Lokasi AdventureRent...')" class="bg-forest-700 hover:bg-forest-800 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition">
+                        Buka Google Maps
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
+            <div class="space-y-3">
+                <div class="flex items-center gap-2 text-white font-black text-xl">
+                    <i class="fa-solid fa-mountain text-amber-500"></i> Adventure<span class="text-forest-600">Rent</span>
+                </div>
+                <p class="text-xs text-slate-400">Penyedia jasa rental peralatan outdoor dan gunung tepercaya dengan standar kelayakan & kebersihan tinggi.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-3">Navigasi Cepat</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><button onclick="navigateTo('home')" class="hover:text-white">Beranda</button></li>
+                    <li><button onclick="navigateTo('catalog')" class="hover:text-white">Katalog Alat</button></li>
+                    <li><button onclick="navigateTo('guide')" class="hover:text-white">Syarat & Cara Sewa</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-3">Kategori Produk</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><button onclick="filterCategoryAndNavigate('Tenda')" class="hover:text-white">Tenda Pendakian</button></li>
+                    <li><button onclick="filterCategoryAndNavigate('Carrier')" class="hover:text-white">Tas Carrier Ergo</button></li>
+                    <li><button onclick="filterCategoryAndNavigate('Cooking')" class="hover:text-white">Cooking Set & Kompor</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-3">Pembayaran Tepercaya</h4>
+                <div class="flex flex-wrap gap-2 text-xs text-slate-300">
+                    <span class="bg-slate-800 px-3 py-1.5 rounded border border-slate-700">QRIS</span>
+                    <span class="bg-slate-800 px-3 py-1.5 rounded border border-slate-700">BCA</span>
+                    <span class="bg-slate-800 px-3 py-1.5 rounded border border-slate-700">Mandiri</span>
+                    <span class="bg-slate-800 px-3 py-1.5 rounded border border-slate-700">GoPay</span>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+            &copy; 2026 AdventureRent Indonesia. Hak Cipta Dilindungi.
+        </div>
+    </footer>
+
+    <script>
+        // DATA PRODUCTS DATABASE
+        const PRODUCTS = [
+            {
+                id: 'prod-1',
+                name: 'Tenda Great Outdoor Java 4 Pro',
+                category: 'Tenda',
+                price: 45000,
+                rating: 4.9,
+                reviewsCount: 38,
+                stock: 6,
+                image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80&w=600',
+                specs: ['Kapasitas 4-5 Orang', 'Double Layer Waterproof 3000mm', 'Frame Aluminium Alloy', 'Berat 3.4kg'],
+                description: 'Tenda tahan badai favorit para pendaki. Dilengkapi vestibule teras luas untuk memasak saat cuaca hujan.'
+            },
+            {
+                id: 'prod-2',
+                name: 'Tas Carrier Eiger Rhinos 60L',
+                category: 'Carrier',
+                price: 40000,
+                rating: 4.8,
+                reviewsCount: 52,
+                stock: 8,
+                image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=600',
+                specs: ['Kapasitas 60 Liter', 'Tropic Air Flow Backsystem', 'Includes Rain Cover', 'Bahan Nylon Robic'],
+                description: 'Sangat nyaman untuk beban berat. Backsystem sirkulasi udara mencegah punggung lembap berlebih.'
+            },
+            {
+                id: 'prod-3',
+                name: 'Cooking Set Nesting DS-308 + Kompor Windproof',
+                category: 'Cooking',
+                price: 25000,
+                rating: 4.7,
+                reviewsCount: 29,
+                stock: 12,
+                image: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&q=80&w=600',
+                specs: ['Nesting Anodized Aluminium (2 Pot + 1 Wok)', 'Kompor Mawar Anti Angin', 'Mangkuk & Sendok Sayur'],
+                description: 'Paket masak ringkas dan tahan angin kencang di camp area.'
+            },
+            {
+                id: 'prod-4',
+                name: 'Sleeping Bag Thermal Goose Down -5°C',
+                category: 'Sleeping',
+                price: 20000,
+                rating: 4.9,
+                reviewsCount: 44,
+                stock: 15,
+                image: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&q=80&w=600',
+                specs: ['Limit Suhu -5°C', 'Bahan Bulu Angsa Sintetis', 'Berat Ringan 800 gram', 'Model Mummy Warm Lock'],
+                description: 'Sleeping bag ekstra hangat untuk puncak gunung tinggi seperti Rinjani, Sumbing, atau Semeru.'
+            },
+            {
+                id: 'prod-5',
+                name: 'Trekking Pole Aluminium Lock Dual Pair',
+                category: 'Accessories',
+                price: 15000,
+                rating: 4.6,
+                reviewsCount: 18,
+                stock: 10,
+                image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&q=80&w=600',
+                specs: ['Isi 1 Pasang (2 pcs)', 'Sistem Quick Lock Adjustable', 'Bahan Duralumin 7075'],
+                description: 'Menjaga kestabilan lutut dan keseimbangan saat trek menanjak maupun menurun curam.'
+            },
+            {
+                id: 'prod-6',
+                name: 'Headlamp LED Waterproof 500 Lumens',
+                category: 'Accessories',
+                price: 10000,
+                rating: 4.8,
+                reviewsCount: 60,
+                stock: 20,
+                image: 'https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&q=80&w=600',
+                specs: ['Rechargeable Type-C', 'Sensors Motion Control', 'Baterai Tahan 12 Jam'],
+                description: 'Senter kepala wajib untuk summit attack dini hari.'
+            },
+            {
+                id: 'prod-7',
+                name: 'Matras Tiup Inflatable Ultralight',
+                category: 'Sleeping',
+                price: 15000,
+                rating: 4.7,
+                reviewsCount: 22,
+                stock: 9,
+                image: 'https://images.unsplash.com/photo-1584267385494-9fdd9a71ad75?auto=format&fit=crop&q=80&w=600',
+                specs: ['Tebal 5cm Empuk', 'Sudah Ada Pompa Tangan Built-in', 'Ukuran Lipat Sebotol Air'],
+                description: 'Tidur makin nyenyak tanpa merasakan batu atau dinginnya tanah gunung.'
+            },
+            {
+                id: 'prod-8',
+                name: 'Tenda Consina Magnum 4 Person',
+                category: 'Tenda',
+                price: 40000,
+                rating: 4.8,
+                reviewsCount: 31,
+                stock: 5,
+                image: 'https://images.unsplash.com/photo-1478827536114-da961b7f86d2?auto=format&fit=crop&q=80&w=600',
+                specs: ['Kapasitas 4 Orang', 'Ventilasi Samping', 'Frame Fiber Reinforced'],
+                description: 'Tenda tangguh serbaguna dengan ruang dalam tinggi dan nyaman.'
+            }
+        ];
+
+        // GLOBAL APP STATE
+        let appState = {
+            activeView: 'home',
+            cart: [], // { productId, qty }
+            categoryFilter: 'all',
+            searchQuery: '',
+            sortOrder: 'popular',
+            rentalStartDate: new Date().toISOString().split('T')[0],
+            rentalEndDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+            rentalDays: 1,
+            paymentScheme: 'dp', // 'dp' or 'full'
+            activeDetailProductId: null
+        };
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set initial dates in cart picker
+            document.getElementById('rental-start-date').value = appState.rentalStartDate;
+            document.getElementById('rental-end-date').value = appState.rentalEndDate;
+            
+            renderFeaturedHomeProducts();
+            renderCatalog();
+            updateCalculator();
+            updateCartBadge();
+        });
+
+        // VIEW ROUTING CONTROLLER
+        function navigateTo(viewName, productId = null) {
+            appState.activeView = viewName;
+            
+            // Hide all pages
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+
+            // Show selected page
+            const targetView = document.getElementById(`view-${viewName}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Trigger specific page renders
+            if (viewName === 'catalog') {
+                renderCatalog();
+            } else if (viewName === 'detail' && productId) {
+                appState.activeDetailProductId = productId;
+                renderProductDetail(productId);
+            } else if (viewName === 'cart') {
+                renderCartPage();
+            } else if (viewName === 'checkout') {
+                if (appState.cart.length === 0) {
+                    showToast('Keranjang sewa Anda masih kosong!', 'error');
+                    navigateTo('catalog');
+                    return;
+                }
+                updatePaymentAmounts();
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // FORMAT CURRENCY UTILITY
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+        }
+
+        // TOAST NOTIFICATION UTILITY
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-xl shadow-lg font-bold text-sm text-white flex items-center gap-3 transition-all duration-300 pointer-events-auto ${type === 'success' ? 'bg-forest-700' : 'bg-rose-600'}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // CALCULATOR WIDGET LOGIC
+        function updateCalculator() {
+            const persons = parseInt(document.getElementById('calc-person').value);
+            const duration = parseInt(document.getElementById('calc-duration').value);
+            const weather = document.getElementById('calc-weather').value;
+
+            document.getElementById('calc-person-val').innerText = `${persons} Orang`;
+
+            // Calculate recommended gear count
+            const tendaCount = Math.ceil(persons / 4);
+            const sbCount = persons;
+            const matrasCount = persons;
+            const cookingCount = Math.ceil(persons / 3);
+
+            let estDailyCost = (tendaCount * 45000) + (sbCount * 20000) + (matrasCount * 15000) + (cookingCount * 25000);
+            if (weather === 'rainy') estDailyCost += (tendaCount * 15000); // Flysheet extra
+
+            document.getElementById('calc-est-price').innerHTML = `Estimasi: <span class="text-forest-700 font-extrabold">${formatRupiah(estDailyCost)}</span>/hari`;
+
+            const resultsContainer = document.getElementById('calc-results-list');
+            resultsContainer.innerHTML = `
+                <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-campground text-forest-600"></i>
+                    <div><span class="font-bold text-slate-800 block">${tendaCount}x Tenda Kap 4</span><span class="text-slate-400">Shelter Utama</span></div>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-bed text-indigo-600"></i>
+                    <div><span class="font-bold text-slate-800 block">${sbCount}x Sleeping Bag</span><span class="text-slate-400">Thermal Comfort</span></div>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-fire-burner text-rose-600"></i>
+                    <div><span class="font-bold text-slate-800 block">${cookingCount}x Cooking Set</span><span class="text-slate-400">Kompor & Nesting</span></div>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-matras text-sky-600"></i>
+                    <div><span class="font-bold text-slate-800 block">${matrasCount}x Matras</span><span class="text-slate-400">Alas Tidur</span></div>
+                </div>
+            `;
+        }
+
+        // CATALOG & PRODUCT DISPLAY LOGIC
+        function filterCategoryAndNavigate(cat) {
+            appState.categoryFilter = cat;
+            navigateTo('catalog');
+            // Update active pill UI
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                if (btn.getAttribute('data-cat') === cat) {
+                    btn.className = 'cat-pill bg-forest-700 text-white px-5 py-2 rounded-full whitespace-nowrap transition shadow-sm';
+                } else {
+                    btn.className = 'cat-pill bg-white hover:bg-slate-100 text-slate-600 px-5 py-2 rounded-full border border-slate-200 whitespace-nowrap transition';
+                }
+            });
+        }
+
+        function setCategoryFilter(cat) {
+            appState.categoryFilter = cat;
+            // Update UI buttons
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                if (btn.getAttribute('data-cat') === cat) {
+                    btn.className = 'cat-pill bg-forest-700 text-white px-5 py-2 rounded-full whitespace-nowrap transition shadow-sm';
+                } else {
+                    btn.className = 'cat-pill bg-white hover:bg-slate-100 text-slate-600 px-5 py-2 rounded-full border border-slate-200 whitespace-nowrap transition';
+                }
+            });
+            renderCatalog();
+        }
+
+        function applyFilters() {
+            appState.searchQuery = document.getElementById('catalog-search').value.toLowerCase();
+            appState.sortOrder = document.getElementById('catalog-sort').value;
+            renderCatalog();
+        }
+
+        function renderFeaturedHomeProducts() {
+            const container = document.getElementById('home-featured-products');
+            const featured = PRODUCTS.slice(0, 4);
+            container.innerHTML = featured.map(p => createProductCardHTML(p)).join('');
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById('catalog-grid');
+            const emptyState = document.getElementById('catalog-empty');
+
+            let list = PRODUCTS.filter(p => {
+                const matchCat = appState.categoryFilter === 'all' || p.category === appState.categoryFilter;
+                const matchSearch = p.name.toLowerCase().includes(appState.searchQuery) || p.description.toLowerCase().includes(appState.searchQuery);
+                return matchCat && matchSearch;
+            });
+
+            // Sorting
+            if (appState.sortOrder === 'low-high') {
+                list.sort((a, b) => a.price - b.price);
+            } else if (appState.sortOrder === 'high-low') {
+                list.sort((a, b) => b.price - a.price);
+            }
+
+            if (list.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                grid.innerHTML = list.map(p => createProductCardHTML(p)).join('');
+            }
+        }
+
+        function createProductCardHTML(product) {
+            return `
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="relative aspect-video overflow-hidden bg-slate-100 cursor-pointer" onclick="navigateTo('detail', '${product.id}')">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-slate-800 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">
+                                ${product.category}
+                            </span>
+                        </div>
+                        <div class="p-5 space-y-2">
+                            <div class="flex items-center gap-1 text-amber-500 text-xs font-bold">
+                                <i class="fa-solid fa-star"></i> ${product.rating} <span class="text-slate-400 font-normal">(${product.reviewsCount})</span>
+                            </div>
+                            <h3 onclick="navigateTo('detail', '${product.id}')" class="font-bold text-slate-900 line-clamp-1 hover:text-forest-600 cursor-pointer text-base">
+                                ${product.name}
+                            </h3>
+                            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                                ${product.description}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="px-5 pb-5 pt-2 border-t border-slate-100 flex items-center justify-between mt-auto">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase text-slate-400 block">Tarif Sewa</span>
+                            <span class="font-black text-forest-700 text-base">${formatRupiah(product.price)}<span class="text-xs text-slate-400 font-normal">/hr</span></span>
+                        </div>
+                        <button onclick="addToCart('${product.id}')" class="bg-forest-700 hover:bg-forest-800 text-white w-10 h-10 rounded-xl flex items-center justify-center transition shadow-md shadow-forest-700/20">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProductDetail(id) {
+            const product = PRODUCTS.find(p => p.id === id);
+            if (!product) return;
+
+            const container = document.getElementById('detail-container');
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                    <div class="space-y-4">
+                        <div class="rounded-2xl overflow-hidden border border-slate-200 aspect-square bg-slate-100">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+                            <i class="fa-solid fa-pump-soap text-base"></i>
+                            <span>Jaminan Steril: Alat telah dibersihkan & didisinfeksi standar pendakian.</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-forest-100 text-forest-800 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                                    ${product.category}
+                                </span>
+                                <span class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-boxes-stacked text-forest-600"></i> Stok Siap: ${product.stock} unit</span>
+                            </div>
+
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">${product.name}</h1>
+
+                            <div class="flex items-center gap-2 text-amber-500 text-sm font-bold">
+                                <i class="fa-solid fa-star"></i> ${product.rating} 
+                                <span class="text-slate-400 font-medium">(${product.reviewsCount} Ulasan Pendaki)</span>
+                            </div>
+
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                <span class="text-xs font-bold uppercase text-slate-400 block mb-1">Harga Sewa Per Hari (24 Jam)</span>
+                                <span class="text-3xl font-black text-forest-700">${formatRupiah(product.price)}</span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Spesifikasi Teknis:</h3>
+                                <ul class="grid grid-cols-1 gap-2 text-xs text-slate-600">
+                                    ${product.specs.map(s => `<li class="flex items-center gap-2"><i class="fa-solid fa-check text-forest-600"></i> ${s}</li>`).join('')}
+                                </ul>
+                            </div>
+
+                            <div class="space-y-2">
+                                <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Deskripsi Alat:</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed">${product.description}</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-6 border-t border-slate-200 flex gap-4">
+                            <button onclick="addToCart('${product.id}')" class="flex-1 bg-forest-700 hover:bg-forest-800 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-forest-700/20 text-center flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-cart-plus"></i> Tambah ke Keranjang Sewa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // CART MANAGEMENT
+        function addToCart(productId) {
+            const existing = appState.cart.find(item => item.productId === productId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                appState.cart.push({ productId, qty: 1 });
+            }
+            updateCartBadge();
+            showToast('Alat berhasil ditambahkan ke keranjang!');
+        }
+
+        function updateCartBadge() {
+            const count = appState.cart.reduce((sum, i) => sum + i.qty, 0);
+            const badge = document.getElementById('cart-badge');
+            if (count > 0) {
+                badge.innerText = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function calculateRentalDuration() {
+            const start = new Date(document.getElementById('rental-start-date').value);
+            const end = new Date(document.getElementById('rental-end-date').value);
+
+            if (end <= start) {
+                showToast('Tanggal pengembalian harus lebih besar dari tanggal ambil!', 'error');
+                // Reset end date to tomorrow
+                const nextDay = new Date(start);
+                nextDay.setDate(nextDay.getDate() + 1);
+                document.getElementById('rental-end-date').value = nextDay.toISOString().split('T')[0];
+                appState.rentalDays = 1;
+            } else {
+                const diffTime = Math.abs(end - start);
+                appState.rentalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }
+
+            document.getElementById('rental-duration-display').innerText = `${appState.rentalDays} Hari (${appState.rentalDays * 24} Jam)`;
+            renderCartPage();
+        }
+
+        function updateCartQty(productId, delta) {
+            const item = appState.cart.find(i => i.productId === productId);
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                appState.cart = appState.cart.filter(i => i.productId !== productId);
+            }
+            updateCartBadge();
+            renderCartPage();
+        }
+
+        function renderCartPage() {
+            const listContainer = document.getElementById('cart-items-list');
+
+            if (appState.cart.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-12 p-4">
+                        <i class="fa-solid fa-cart-flatbed text-4xl text-slate-300 mb-3"></i>
+                        <p class="text-slate-600 font-bold">Keranjang sewa Anda kosong</p>
+                        <p class="text-xs text-slate-400 mt-1 mb-4">Pilih alat pendakian yang Anda butuhkan terlebih dahulu.</p>
+                        <button onclick="navigateTo('catalog')" class="bg-forest-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs">Jelajahi Katalog</button>
+                    </div>
+                `;
+                document.getElementById('cart-subtotal-per-day').innerText = formatRupiah(0);
+                document.getElementById('cart-total-rental-fee').innerText = formatRupiah(0);
+                document.getElementById('cart-grand-total').innerText = formatRupiah(0);
+                return;
+            }
+
+            let subtotalDaily = 0;
+
+            listContainer.innerHTML = appState.cart.map(item => {
+                const prod = PRODUCTS.find(p => p.id === item.productId);
+                const itemDailyTotal = prod.price * item.qty;
+                subtotalDaily += itemDailyTotal;
+
+                return `
+                    <div class="p-4 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${prod.image}" alt="${prod.name}" class="w-16 h-16 rounded-xl object-cover border border-slate-200">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">${prod.name}</h4>
+                                <span class="text-xs text-slate-400">${formatRupiah(prod.price)} / hari</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-6">
+                            <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden bg-slate-50">
+                                <button onclick="updateCartQty('${prod.id}', -1)" class="px-2.5 py-1 text-slate-600 hover:bg-slate-200 font-bold">-</button>
+                                <span class="px-3 text-xs font-bold text-slate-800">${item.qty}</span>
+                                <button onclick="updateCartQty('${prod.id}', 1)" class="px-2.5 py-1 text-slate-600 hover:bg-slate-200 font-bold">+</button>
+                            </div>
+                            <span class="font-bold text-slate-800 text-sm">${formatRupiah(itemDailyTotal * appState.rentalDays)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const totalRentalFee = subtotalDaily * appState.rentalDays;
+            const depositFee = 50000; // Fixed deposit
+            const grandTotal = totalRentalFee + depositFee;
+
+            document.getElementById('cart-subtotal-per-day').innerText = formatRupiah(subtotalDaily);
+            document.getElementById('cart-days-count').innerText = `${appState.rentalDays} Hari`;
+            document.getElementById('cart-total-rental-fee').innerText = formatRupiah(totalRentalFee);
+            document.getElementById('cart-deposit-fee').innerText = formatRupiah(depositFee);
+            document.getElementById('cart-grand-total').innerText = formatRupiah(grandTotal);
+        }
+
+        // CHECKOUT & PAYMENT LOGIC
+        function previewKtpUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('ktp-preview-img').src = e.target.result;
+                    document.getElementById('ktp-upload-prompt').classList.add('hidden');
+                    document.getElementById('ktp-upload-preview').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updatePaymentAmounts() {
+            const scheme = document.querySelector('input[name="payment_scheme"]:checked').value;
+            appState.paymentScheme = scheme;
+
+            let subtotalDaily = appState.cart.reduce((sum, item) => {
+                const prod = PRODUCTS.find(p => p.id === item.productId);
+                return sum + (prod.price * item.qty);
+            }, 0);
+
+            const totalRentalFee = subtotalDaily * appState.rentalDays;
+            const depositFee = 50000;
+            const grandTotal = totalRentalFee + depositFee;
+
+            let payNow = 0;
+            let payLater = 0;
+
+            if (scheme === 'dp') {
+                payNow = (totalRentalFee * 0.5) + depositFee;
+                payLater = totalRentalFee * 0.5;
+                document.getElementById('checkout-pay-now-label').innerText = 'DP 50% + Jaminan Deposit';
+            } else {
+                payNow = grandTotal;
+                payLater = 0;
+                document.getElementById('checkout-pay-now-label').innerText = 'Lunas (100% Total)';
+            }
+
+            document.getElementById('checkout-pay-now-amount').innerText = formatRupiah(payNow);
+            document.getElementById('checkout-pay-later-amount').innerText = formatRupiah(payLater);
+        }
+
+        function handleCheckoutSubmit(event) {
+            event.preventDefault();
+
+            // Generate Booking ID
+            const bookingId = 'ADV-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('receipt-booking-id').innerText = bookingId;
+
+            // Dates summary
+            const startVal = document.getElementById('rental-start-date').value;
+            const endVal = document.getElementById('rental-end-date').value;
+            document.getElementById('receipt-dates').innerText = `${startVal} s/d ${endVal} (${appState.rentalDays} Hari)`;
+
+            // Transfer amount
+            const payNowText = document.getElementById('checkout-pay-now-amount').innerText;
+            document.getElementById('receipt-transfer-amount').innerText = payNowText;
+
+            // Reset cart & Navigate to receipt
+            appState.cart = [];
+            updateCartBadge();
+
+            navigateTo('receipt');
+            showToast('Pemesanan berhasil dibuat! Silakan selesaikan pembayaran.');
+        }
+
+        function confirmPaymentSimulation() {
+            alert('Mengarahkan ke WhatsApp Admin AdventureRent untuk mengonfirmasi bukti transfer...');
+        }
+    </script>
+</body>
+</html>
